@@ -15,8 +15,8 @@ function SurveyPage() {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleNameNext = () => {
-    const trimmed = name.trim();
+  const handleNameNext = (rawName: string) => {
+    const trimmed = rawName.trim();
     if (!trimmed) {
       toast.error("Por favor, digite seu nome");
       return;
@@ -25,6 +25,7 @@ function SurveyPage() {
       toast.error("Nome muito longo");
       return;
     }
+    setName(trimmed);
     setStep("rating");
   };
 
@@ -72,7 +73,7 @@ function SurveyPage() {
 
       {/* Content */}
       <section className="relative z-10 mx-auto flex min-h-[calc(100vh-7rem)] max-w-3xl items-center justify-center px-6 pb-16 md:px-12">
-        {step === "name" && <NameStep name={name} setName={setName} onNext={handleNameNext} />}
+        {step === "name" && <NameStep name={name} onNext={handleNameNext} />}
         {step === "rating" && <RatingStep name={name} onRate={handleRate} submitting={submitting} />}
         {step === "done" && <DoneStep name={name} />}
       </section>
@@ -80,7 +81,7 @@ function SurveyPage() {
   );
 }
 
-function NameStep({ name, setName, onNext }: { name: string; setName: (v: string) => void; onNext: () => void }) {
+function NameStep({ name, onNext }: { name: string; onNext: (value: string) => void }) {
   return (
     <div className="w-full animate-pop text-center">
       <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-sm font-medium text-primary shadow-soft">
@@ -93,23 +94,29 @@ function NameStep({ name, setName, onNext }: { name: string; setName: (v: string
         Sua opinião nos ajuda a cuidar melhor de você 💚
       </p>
 
-      <div className="mx-auto mt-10 max-w-xl">
+      <form
+        className="mx-auto mt-10 max-w-xl"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          onNext(String(formData.get("firstName") ?? ""));
+        }}
+      >
         <input
           autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onNext()}
+          name="firstName"
+          defaultValue={name}
           maxLength={50}
           placeholder="Digite seu primeiro nome"
           className="w-full rounded-3xl border-2 border-border bg-card px-6 py-5 text-center text-xl font-medium text-foreground placeholder:text-muted-foreground/60 shadow-card transition focus:border-primary focus:outline-none md:text-2xl"
         />
         <button
-          onClick={onNext}
+          type="submit"
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-3xl bg-gradient-hero px-8 py-5 text-lg font-bold text-primary-foreground shadow-glow transition hover:scale-[1.02] active:scale-100 md:text-xl"
         >
           Continuar <ArrowRight className="h-5 w-5" />
         </button>
-      </div>
+      </form>
     </div>
   );
 }
