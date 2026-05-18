@@ -137,7 +137,7 @@ function RatingStep({ name, onRate, submitting }: { name: string; onRate: (r: "g
           onClick={() => !submitting && onRate("gostei")}
           icon={<ThumbsUp className="h-12 w-12" strokeWidth={2.5} />}
           label="Gostei"
-          emoji="😊"
+          emoji="😀"
           gradient="bg-gradient-success"
           disabled={submitting}
         />
